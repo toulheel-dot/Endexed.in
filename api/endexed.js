@@ -102,7 +102,7 @@ export default async function handler(request, response) {
     // ✅ Success Response (सिर्फ ज़रूरी डेटा)
     const finalJson = {
       status: "success",
-      developer: "@jobdiya",
+      developer: "@Endexed",
       vehicle_number: vehicleNumber,
       mobile_number: mobileNumber,
       response_time: responseTimeMs + "ms",

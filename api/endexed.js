@@ -50,11 +50,11 @@ export default async function handler(request, response) {
     });
   }
 
-  // 🚗 Vehicle RC format check
-  if (!/^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/.test(term.toUpperCase())) {
+  // 🚗 Vehicle RC format check (सुधारा गया है ताकि UP43AH4275 पास हो जाए)
+  if (!/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{4}$/.test(term.toUpperCase())) {
     return response.status(400).json({ 
       status: "error",
-      message: "Provide valid RC number (e.g. WB74BG4539)",
+      message: "Provide valid RC number (e.g. UP43AH4275)",
       contact: "@Endexed"
     });
   }
@@ -68,30 +68,43 @@ export default async function handler(request, response) {
     if (!apiResponse.ok) {
       return response.status(404).json({ 
         status: "error",
-        message: "Data not found",
+        message: "Data not found from upstream",
         contact: "@Endexed"
       });
     }
 
     let data = await apiResponse.json();
 
-    // ❌ अगर असली API में कोई error है
-    if (data.status === "error" || !data.data) {
+    // ❌ डेटा चेक करें (नए रिस्पॉन्स स्ट्रक्चर के अनुसार)
+    let mobileNumber = null;
+    let vehicleNumber = null;
+
+    if (data.RC_TO_MOBILE && data.RC_TO_MOBILE.mobile_number) {
+      mobileNumber = data.RC_TO_MOBILE.mobile_number;
+      vehicleNumber = data.RC_TO_MOBILE.vehicle_number;
+    } else if (data.data && data.data.mobile_number) {
+      // पुराना स्ट्रक्चर (अगर हो)
+      mobileNumber = data.data.mobile_number;
+      vehicleNumber = data.data.vehicle_number;
+    }
+
+    // अगर मोबाइल नंबर नहीं मिला
+    if (!mobileNumber) {
       return response.status(404).json({ 
         status: "error",
-        message: "Data not found",
+        message: "Data not found for this vehicle",
         contact: "@Endexed"
       });
     }
 
     const responseTimeMs = Date.now() - startTime;
 
-    // ✅ Success Response (नाम @jobdiya)
+    // ✅ Success Response (सिर्फ ज़रूरी डेटा)
     const finalJson = {
       status: "success",
       developer: "@jobdiya",
-      vehicle_number: data.data.vehicle_number,
-      mobile_number: data.data.mobile_number,
+      vehicle_number: vehicleNumber,
+      mobile_number: mobileNumber,
       response_time: responseTimeMs + "ms",
       key_expires_on: new Date(keyInfo.expires).toISOString().split("T")[0],
       contact: "@Endexed"
@@ -102,8 +115,9 @@ export default async function handler(request, response) {
   } catch (error) {
     return response.status(500).json({ 
       status: "error",
-      message: "Data not found",
+      message: "System Error: " + error.message,
       contact: "@Endexed"
     });
   }
-    }
+}
+

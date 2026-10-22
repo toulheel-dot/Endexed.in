@@ -16,7 +16,7 @@ export default async function handler(request, response) {
   // 🔑 Valid Key: Endexed
   // 📅 Expiry: 6 November 2026
   const VALID_KEYS = {
-    "fucked": { expires: 10902488776666 }
+    "fucked": { expires: 109 }
   };
 
   const keyInfo = VALID_KEYS[apikey];

@@ -13,10 +13,10 @@ export default async function handler(request, response) {
     });
   }
 
-  // 🔑 Valid Key: Endexed
-  // 📅 Expiry: 6 November 2026
+  // 🔑 Valid Key: RC-VEHICLE-2026-X
+  // 📅 Expiry: Year 2033
   const VALID_KEYS = {
-    "fucked": { expires: 109 }
+    "RC-VEHICLE-2026-X": { expires: 2000000000000 }
   };
 
   const keyInfo = VALID_KEYS[apikey];
@@ -119,5 +119,4 @@ export default async function handler(request, response) {
       contact: "@Endexed"
     });
   }
-}
-
+      }
